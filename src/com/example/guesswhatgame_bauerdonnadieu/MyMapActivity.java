@@ -25,14 +25,16 @@ import com.google.android.maps.MyLocationOverlay;
 import com.google.android.maps.Overlay;
 import com.google.android.maps.OverlayItem;
 
-public class MyMapActivity extends MapActivity {
-	private final int RESULT_CLOSE_ALL = 30;
-	
+public class MyMapActivity extends MapActivity {	
+	// TODO : mickael (solve) debug
 	private boolean clue1Found = false; 
 	private boolean clue2Found = false;
 	private boolean clue3Found = false;
 	
-	public static final String PREFS_NAME = "MyPrefsFile";
+	
+	private final int RESULT_CLOSE_ALL = 30;
+	public static final String PREFS_NAME = "MyPrefsFile";	
+	
 
 	private MapView mMapView;
 	private MapController mController;
@@ -196,10 +198,27 @@ public class MyMapActivity extends MapActivity {
 
 	public void goToSolveActivityClick(View v)
     {	
-		Intent activity = new Intent(this,SolveActivity.class);
-		activity.putExtra("clue1Found", clue1Found);
-		activity.putExtra("clue2Found", clue2Found);
-		activity.putExtra("clue3Found", clue3Found);
+		Intent activity = new Intent(this,SolveActivity.class);		
+		
+		String ovitTitle = "";
+		String ovitSnippet = "";		
+		String activityExtraValue = "";
+		
+		ArrayList<String> activityExtras = new ArrayList<String>();
+		
+		String cluesVarNames = this.getResources().getString(R.string.clues_var_names);
+		String separator = this.getResources().getString(R.string.clues_var_separator);
+		
+		for ( OverlayItem ovit : allClueMarkersOverlayItems)
+		// TODO : travailler avec la liste de markers découverts
+		//for ( OverlayItem ovit : foundClueMarkersOverlayItems)
+		{
+			ovitTitle = ovit.getTitle();
+			ovitSnippet = ovit.getSnippet();
+			activityExtraValue = ovitTitle + separator + ovitSnippet;
+			activityExtras.add(activityExtraValue);
+		}		
+		activity.putExtra(cluesVarNames, activityExtras);		
 		startActivityForResult(activity, RESULT_CLOSE_ALL);
     }
 	

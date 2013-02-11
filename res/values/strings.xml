@@ -21,5 +21,7 @@
     <string name="t_enter_solution">Enter solution:</string>
     <string name="t_btn_back">Back</string>
     <string name="t_btn_try">Try</string>
+    <string name="clues_var_names">_CLUE</string>
+    <string name="clues_var_separator">;;;</string>
 
 </resources>

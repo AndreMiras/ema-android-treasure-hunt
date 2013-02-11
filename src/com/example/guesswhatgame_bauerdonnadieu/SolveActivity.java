@@ -1,9 +1,10 @@
 package com.example.guesswhatgame_bauerdonnadieu;
 
+import java.util.ArrayList;
+
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.Intent;
 import android.text.Editable;
 import android.view.Menu;
 import android.view.View;
@@ -13,7 +14,6 @@ import android.widget.Toast;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.content.DialogInterface;
-import android.content.res.Resources;
 
 public class SolveActivity extends Activity 
 {
@@ -22,10 +22,6 @@ public class SolveActivity extends Activity
 	// Indices des boites de dialogues à afficher
 	private static final int DIALOG_WRONG = 10;
 	private static final int DIALOG_GOOD  = 20;
-	
-	private boolean clue1Found = false; 
-	private boolean clue2Found = false;
-	private boolean clue3Found = false;
 	
 	// Solution de l'énigme
 	private static String enigmaSolution = "toto a la plage";
@@ -39,26 +35,26 @@ public class SolveActivity extends Activity
 		Bundle extras = getIntent().getExtras();		
 		if(extras != null) 
 		{
-			this.clue1Found = extras.getBoolean("clue1Found");
-			this.clue2Found = extras.getBoolean("clue2Found");
-			this.clue3Found = extras.getBoolean("clue3Found");			
-		}		
-		
-		if(this.clue1Found)
-		{
-			TextView tv = (TextView)findViewById(R.id.textClue1Val);
-			int txt_id = R.string.t_clue1_val;
-			Resources res = this.getResources();
-			String txt = res.getString(txt_id);
-			tv.setText(txt);
-		}
-		if(this.clue2Found)
-		{
-			((TextView)findViewById(R.id.textClue2Val)).setText(this.getResources().getString(R.string.t_clue2_val));
-		}
-		if(this.clue3Found)
-		{
-			((TextView)findViewById(R.id.textClue3Val)).setText(this.getResources().getString(R.string.t_clue3_val));
+			String cluesVarNames = this.getResources().getString(R.string.clues_var_names);
+			ArrayList<String> cluesList = extras.getStringArrayList(cluesVarNames);	
+			
+			if(cluesList != null)
+			{
+				// TODO : DEBUG - Exemple d'utilisation réutilisant (salement) le code déjà en place
+				// afficher plutot dans une liste scrollable pour pouvoir afficher N Clues
+				int i=0;
+				
+				for (String clue : cluesList)
+				{					
+					if (i==0)
+						((TextView)findViewById(R.id.textClue1Val)).setText(clue.split(this.getResources().getString(R.string.clues_var_separator))[1]);
+					if (i==1)
+						((TextView)findViewById(R.id.textClue2Val)).setText(clue.split(this.getResources().getString(R.string.clues_var_separator))[1]);
+					if (i==2)
+						((TextView)findViewById(R.id.textClue3Val)).setText(clue.split(this.getResources().getString(R.string.clues_var_separator))[1]);
+					i++;
+				}
+			}			
 		}
 	}
 
@@ -77,6 +73,7 @@ public class SolveActivity extends Activity
 		SolveActivity.this.finish();
 	}
 
+	@SuppressWarnings("deprecation")
 	public void onTryClick(View v) 
 	{
 		boolean found = false;
@@ -99,6 +96,7 @@ public class SolveActivity extends Activity
 		
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	protected Dialog onCreateDialog(int id) 
 	{
@@ -106,7 +104,7 @@ public class SolveActivity extends Activity
 		{
 			case DIALOG_GOOD:
 			{
-				// CreateoutAlterDialog
+				// Create out AlterDialog
 				Builder builder = new AlertDialog.Builder(this);
 				builder.setMessage("Congratulation");
 				builder.setCancelable(true);
