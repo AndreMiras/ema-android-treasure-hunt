@@ -25,15 +25,12 @@ import com.google.android.maps.MyLocationOverlay;
 import com.google.android.maps.Overlay;
 import com.google.android.maps.OverlayItem;
 
-public class MyMapActivity extends MapActivity {	
-	// TODO : mickael (solve) debug
-	private boolean clue1Found = false; 
-	private boolean clue2Found = false;
-	private boolean clue3Found = false;
-	
-	
+public class MyMapActivity extends MapActivity {
 	private final int RESULT_CLOSE_ALL = 30;
-	public static final String PREFS_NAME = "MyPrefsFile";	
+	public static final String PREFS_NAME = "MyPrefsFile";
+	
+	// Solution de l'énigme
+	private static String enigmaSolution = "solution";
 	
 
 	private MapView mMapView;
@@ -199,6 +196,7 @@ public class MyMapActivity extends MapActivity {
 	public void goToSolveActivityClick(View v)
     {	
 		Intent activity = new Intent(this,SolveActivity.class);		
+		activity.putExtra(this.getResources().getString(R.string.enigma_solution_var), enigmaSolution);
 		
 		String ovitTitle = "";
 		String ovitSnippet = "";		
@@ -308,16 +306,16 @@ public class MyMapActivity extends MapActivity {
 	
 	public void fakeClue1(View v)
 	{
-		clue1Found = true;
+		//clue1Found = true;
 	}
 	
 	public void fakeClue2(View v)
 	{
-		clue2Found = true;
+		//clue2Found = true;
 	}
 	
 	public void fakeClue3(View v)
 	{
-		clue3Found = true;
+		//clue3Found = true;
 	}
 }

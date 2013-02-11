@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     tools:context=".SolveActivity" >
 
-    <TextView
+    <!--TextView
         android:id="@+id/textClue1Val"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -49,7 +49,7 @@
         android:layout_alignLeft="@+id/editSolution"
         android:layout_below="@+id/textClue2"
         android:text="@string/t_clue3"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:textAppearance="?android:attr/textAppearanceMedium" /-->
 
     <TextView
         android:id="@+id/textEnterSolution"
@@ -71,7 +71,7 @@
         android:layout_marginTop="33dp"
         android:ems="10" />
 
-    <TextView
+    <!--TextView
         android:id="@+id/textClue3Val"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -79,7 +79,7 @@
         android:layout_alignBottom="@+id/textClue3"
         android:layout_alignLeft="@+id/textClue2Val"
         android:text="@string/t_clue_val_default"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:textAppearance="?android:attr/textAppearanceMedium" /-->
 
     <TextView
         android:id="@+id/textClues"
@@ -111,5 +111,15 @@
         android:layout_toRightOf="@+id/textClue3Val"
         android:onClick="onTryClick"
         android:text="@string/t_btn_try" />
+
+    <TextView
+        android:id="@+id/textViewCluesList"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/textEnterSolution"
+        android:layout_below="@+id/textClues"
+        android:layout_marginTop="15dp"
+        android:text=""
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
 </RelativeLayout>

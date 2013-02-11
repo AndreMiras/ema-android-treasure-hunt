@@ -24,10 +24,10 @@ public class SolveActivity extends Activity
 	private static final int DIALOG_GOOD  = 20;
 	
 	// Solution de l'énigme
-	private static String enigmaSolution = "toto a la plage";
+	private static String enigmaSolution;
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) 
+	protected void onCreate(Bundle savedInstanceState)  
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_solve);
@@ -35,25 +35,24 @@ public class SolveActivity extends Activity
 		Bundle extras = getIntent().getExtras();		
 		if(extras != null) 
 		{
+			enigmaSolution = extras.getString(this.getResources().getString(R.string.enigma_solution_var));
+			
 			String cluesVarNames = this.getResources().getString(R.string.clues_var_names);
 			ArrayList<String> cluesList = extras.getStringArrayList(cluesVarNames);	
 			
 			if(cluesList != null)
-			{
-				// TODO : DEBUG - Exemple d'utilisation réutilisant (salement) le code déjà en place
-				// afficher plutot dans une liste scrollable pour pouvoir afficher N Clues
-				int i=0;
+			{				
+				String currentText = "";
 				
 				for (String clue : cluesList)
-				{					
-					if (i==0)
-						((TextView)findViewById(R.id.textClue1Val)).setText(clue.split(this.getResources().getString(R.string.clues_var_separator))[1]);
-					if (i==1)
-						((TextView)findViewById(R.id.textClue2Val)).setText(clue.split(this.getResources().getString(R.string.clues_var_separator))[1]);
-					if (i==2)
-						((TextView)findViewById(R.id.textClue3Val)).setText(clue.split(this.getResources().getString(R.string.clues_var_separator))[1]);
-					i++;
+				{
+					currentText += clue.split(this.getResources().getString(R.string.clues_var_separator))[0];
+					currentText += " - ";
+					currentText += clue.split(this.getResources().getString(R.string.clues_var_separator))[1];
+					currentText += "\n";
 				}
+				
+				((TextView)findViewById(R.id.textViewCluesList)).setText(currentText);
 			}			
 		}
 	}
