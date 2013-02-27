@@ -31,7 +31,7 @@ public class MyMapActivity extends MapActivity {
 	private final int RESULT_CLOSE_ALL = 30;
 	public static final String PREFS_NAME = "MyPrefsFile";
 	
-	// Solution de l'énigme
+	// Solution de l'ï¿½nigme
 	private static String enigmaSolution = "solution";
 	
 
@@ -186,49 +186,56 @@ public class MyMapActivity extends MapActivity {
 	 */
 	private GeoPoint getRandomGeoPoint(GeoPoint squareCenter, int squareSizeMeter) {
 		// generates random lat long
-		// TODO: this is for debugging purposes, but the GeoPoint must be
-		// physically reachable
-		// int maxLat = 90;
-		// int maxLng = 180;
-		int latE6 = squareCenter.getLatitudeE6();
-		int lngE6 = squareCenter.getLongitudeE6();
-		double lat0 = squareCenter.getLatitudeE6() / 1E6;
-		double lng0 = squareCenter.getLongitudeE6() / 1E6;
-		//
-		int randomLat = getRandomInt(latE6 - 1, latE6 + 1);
-		int randomLng = getRandomInt(lngE6 - 1, lngE6 + 1);
-		// http://stackoverflow.com/questions/2839533/adding-distance-to-a-gps-coordinate
-		double earthRadiusMeter = 6378137;
+		/*
+		 * TODO: is it OK if the point are not always physically
+		 * reachable (as they're generated randomly)?
+		 */
 		double distanceY = squareSizeMeter / 2;
 		double distanceX = squareSizeMeter / 2;
 
-		GeoPoint point;
-		point = addDistanceOffset(squareCenter, -distanceX, distanceY);
-		// TODO[debug]: just for testing proses
-		OverlayItem overlayitem = new OverlayItem(point, "markerTitle",
+		GeoPoint topLeftPoint = addDistanceOffset(squareCenter, -distanceX, distanceY);
+		/*
+		// TODO[debug]: just for testing purposes
+		OverlayItem overlayitem = new OverlayItem(topLeftPoint, "markerTitle1 top left",
 				"'markerDescription");
 		itemizedOverlay.addOverlay(overlayitem);
+		*/
 
-
-		point = addDistanceOffset(squareCenter, distanceX, distanceY);
-		// TODO[debug]: just for testing proses
-		overlayitem = new OverlayItem(point, "markerTitle",
+		GeoPoint topRightPoint = addDistanceOffset(squareCenter, distanceX, distanceY);
+		/*
+		// TODO[debug]: just for testing purposes
+		overlayitem = new OverlayItem(topRightPoint, "markerTitle2 top right",
 				"'markerDescription");
 		itemizedOverlay.addOverlay(overlayitem);
+		*/
 
-
-		point = addDistanceOffset(squareCenter, distanceX, -distanceY);
-		// TODO[debug]: just for testing proses
-		overlayitem = new OverlayItem(point, "markerTitle",
+		GeoPoint bottomRightPoint = addDistanceOffset(squareCenter, distanceX, -distanceY);
+		/*
+		// TODO[debug]: just for testing purposes
+		overlayitem = new OverlayItem(bottomRightPoint, "markerTitle3 bottom right",
 				"'markerDescription");
 		itemizedOverlay.addOverlay(overlayitem);
+		*/
 
-
-		point = addDistanceOffset(squareCenter, -distanceX, -distanceY);
-		// TODO[debug]: just for testing proses
-		overlayitem = new OverlayItem(point, "markerTitle",
+		GeoPoint bottomLeftPoint = addDistanceOffset(squareCenter, -distanceX, -distanceY);
+		/*
+		// TODO[debug]: just for testing purposes
+		overlayitem = new OverlayItem(bottomLeftPoint, "markerTitle4 bottom left",
 				"'markerDescription");
 		itemizedOverlay.addOverlay(overlayitem);
+		*/
+
+		// so we get a random lat/long that is between min lat/long (bottom left) and max lat/long top right corner
+		// which ever left or right, we're interested in bottom and top
+		int minLat = bottomLeftPoint.getLatitudeE6();
+		int maxLat = topLeftPoint.getLatitudeE6();
+		int randomLat = getRandomInt(minLat, maxLat);
+
+		// which ever bottom or top, we're interested in left and right
+		int minLng = topLeftPoint.getLongitudeE6();
+		int maxLng = topRightPoint.getLongitudeE6();
+		int randomLng = getRandomInt(minLng, maxLng);
+		GeoPoint point = new GeoPoint(randomLat, randomLng);
 
 		return point;
 	}
@@ -279,7 +286,7 @@ public class MyMapActivity extends MapActivity {
 		String separator = this.getResources().getString(R.string.clues_var_separator);
 		
 		for ( OverlayItem ovit : allClueMarkersOverlayItems)
-		// TODO : travailler avec la liste de markers découverts
+		// TODO : travailler avec la liste de markers dï¿½couverts
 		//for ( OverlayItem ovit : foundClueMarkersOverlayItems)
 		{
 			ovitTitle = ovit.getTitle();
