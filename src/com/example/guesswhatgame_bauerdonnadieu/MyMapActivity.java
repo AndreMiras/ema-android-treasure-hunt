@@ -12,6 +12,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.Menu;
@@ -47,16 +49,15 @@ public class MyMapActivity extends MapActivity {
 	 * The list of already found clue markers
 	 */
 	private ArrayList<OverlayItem> foundClueMarkersOverlayItems;
-	private Random randomGenerator;
+	private Random randomGenerator = new Random();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_map);
 		setupMapView();
-		loadMarkers();
-		optimalMapSetup();
 		setupLocationManager();
+		waitForFirstFix();
 	}
 
 	private void setupMapView() {
@@ -76,18 +77,32 @@ public class MyMapActivity extends MapActivity {
 				getApplicationContext(),
 				mMapView);
 		myLocationOverlay.enableMyLocation();
-		// centers the map on user location
-		myLocationOverlay.runOnFirstFix(new Runnable() {
-			public void run() {
-				mController.animateTo(myLocationOverlay.getMyLocation());
-				mController.setZoom(17);
-			}
-		});
 
 		// adds itemizedOverlay and myLocationOverlay
 		mapOverlays.add(itemizedOverlay);
 		mapOverlays.add(myLocationOverlay);
 		mMapView.invalidate(); // refreshes the map
+	}
+
+	// TODO: display some kind of animation and message saying we are waiting for GPS FIX
+	/**
+	 * - centers the map on user location
+	 * - loads makers around the user location
+	 */
+	private void waitForFirstFix()
+	{
+
+		// centers the map on user location
+		myLocationOverlay.runOnFirstFix(new Runnable() {
+			public void run() {
+				GeoPoint point = myLocationOverlay.getMyLocation();
+				mController.animateTo(point);
+				mController.setZoom(17);
+
+				loadMarkers();
+				optimalMapSetup();
+			}
+		});
 	}
 
 	private void optimalMapSetup()
@@ -102,76 +117,119 @@ public class MyMapActivity extends MapActivity {
 		// getSystemService
 		// Get the location manager
 	    locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-	    /*
-	    // Define the criteria how to select the locatioin provider -> use
-	    // default
-	    Criteria criteria = new Criteria();
-	    provider = locationManager.getBestProvider(criteria, false);
-		Location location = locationManager.getLastKnownLocation(provider);
-		// Initialize the location fields
-		if (location != null) {
-			// System.out.println("Provider " + provider + " has been selected.");
-			onLocationChanged(location);
-		} else {
-			// latituteField.setText("Location not available");
-			// longitudeField.setText("Location not available");
-		}
-	     */
 	}
 
 	// TODO: we should be loading them from XML files or something like that
 	private void loadMarkers() {
-		if (allClueMarkersOverlayItems == null)
+
+		int squareSizeMeter = 10 * 1000; // 10 KM // TODO[hardcoded]: use consts instead
+		GeoPoint squareCenter = myLocationOverlay.getMyLocation();
+
+		if (allClueMarkersOverlayItems == null) // TODO: is this still needed?
 		{
-			addRandomMarkers(5); // TODO[hardcoded]: use consts instead
+			addRandomMarkers(squareCenter, squareSizeMeter, 5); // TODO[hardcoded]: use consts instead
 		}
-		else
-		{
-			itemizedOverlay.addOverlays(allClueMarkersOverlayItems);
-		}
-		// allClueMarkersOverlayItems
+		// itemizedOverlay.addOverlays(allClueMarkersOverlayItems); // TODO: is this still needed?
 	}
 
-	private void addRandomMarkers(int count)
+	private void addRandomMarkers(GeoPoint squareCenter, int squareSizeMeter, int count)
 	{
-		ArrayList<String> markerDescriptions = new ArrayList<String>();
-		for (int i = 0; i < count; i++) {
-			markerDescriptions.add("Clue " + i);
-		}
-		addRandomMarkers(markerDescriptions);
-		allClueMarkersOverlayItems = itemizedOverlay.getOverLays();
-	}
-
-	private void addRandomMarkers(ArrayList<String> markerDescriptions) {
-		randomGenerator = new Random();
+		ArrayList<GeoPoint> geoPoints = getRandomGeoPoints(squareCenter, squareSizeMeter, count);
+		GeoPoint markerPoint;
 		String markerTitle;
-		int i = 0;
-		for (String markerDescription : markerDescriptions) {
-			markerTitle = "Clue " + i;
-			addRandomMarker(markerTitle, markerDescription);
-			i++;
+		String markerDescription;
+		for (int i = 0; i < count; i++) {
+			markerPoint = geoPoints.get(i);
+			markerTitle = "Title " + i;
+			markerDescription = "Clue " + i;
+			addMarker(markerPoint, markerTitle, markerDescription);
 		}
+		// allClueMarkersOverlayItems = itemizedOverlay.getOverLays(); // TODO: is this still needed?
 	}
 
+	private void addMarker(GeoPoint markerPoint, String markerTitle, String markerDescription) {
+		OverlayItem overlayitem = new OverlayItem(markerPoint, markerTitle,
+				markerDescription);
+		itemizedOverlay.addOverlay(overlayitem);
+	}
+
+	/**
+	 * This is quite precise as long as the random distance offset is between 10-100 km
+	 * @param originGeoPoint
+	 * @param distanceXMeter
+	 * @param distanceYMeter
+	 * @return
+	 */
+	private GeoPoint addDistanceOffset(GeoPoint originGeoPoint, double distanceXMeter, double distanceYMeter)
+	{
+		GeoPoint point;
+		final double earthRadiusMeter = 6378137;
+		double lat0 = originGeoPoint.getLatitudeE6() / 1E6;
+		double lng0 = originGeoPoint.getLongitudeE6() / 1E6;
+		// http://stackoverflow.com/questions/2839533/adding-distance-to-a-gps-coordinate
+		double lat = lat0 + (180/Math.PI) * (distanceYMeter/earthRadiusMeter);
+		double lng = lng0 + (180/Math.PI) * (distanceXMeter/earthRadiusMeter)/Math.cos(lat0);
+		// radius = (int)projection.metersToEquatorPixels(item.getRadiusInMeters());
+		// converts to micro dedegrees GeoPoint
+		// GeoPoint point = new GeoPoint((int) (randomLat * 1E6), (int) (randomLng * 1E6));
+		int latE6 = (int) (lat * 1E6);
+		int lngE6 = (int) (lng * 1E6);
+		point = new GeoPoint(latE6, lngE6);
+
+		return point;
+	}
+
+	// TODO: update docstring
 	// TODO: Get available points from an XML file and "randomize" it
 	/**
 	 *
-	 * @return a random GeoPoint that isn't already used
+	 * @return a random GeoPoint in the given square
 	 */
-	private GeoPoint getRandomGeoPoint() {
+	private GeoPoint getRandomGeoPoint(GeoPoint squareCenter, int squareSizeMeter) {
 		// generates random lat long
 		// TODO: this is for debugging purposes, but the GeoPoint must be
 		// physically reachable
 		// int maxLat = 90;
 		// int maxLng = 180;
-		int franceLat = 46;
-		int franceLng = 2;
+		int latE6 = squareCenter.getLatitudeE6();
+		int lngE6 = squareCenter.getLongitudeE6();
+		double lat0 = squareCenter.getLatitudeE6() / 1E6;
+		double lng0 = squareCenter.getLongitudeE6() / 1E6;
 		//
-		int randomLat = getRandomInt(franceLat - 1, franceLat + 1);
-		int randomLng = getRandomInt(franceLng - 1, franceLng + 1);
-		// converts to micro dedegrees GeoPoint
-		GeoPoint point = new GeoPoint((int) (randomLat * 1E6),
-				(int) (randomLng * 1E6));
+		int randomLat = getRandomInt(latE6 - 1, latE6 + 1);
+		int randomLng = getRandomInt(lngE6 - 1, lngE6 + 1);
+		// http://stackoverflow.com/questions/2839533/adding-distance-to-a-gps-coordinate
+		double earthRadiusMeter = 6378137;
+		double distanceY = squareSizeMeter / 2;
+		double distanceX = squareSizeMeter / 2;
+
+		GeoPoint point;
+		point = addDistanceOffset(squareCenter, -distanceX, distanceY);
+		// TODO[debug]: just for testing proses
+		OverlayItem overlayitem = new OverlayItem(point, "markerTitle",
+				"'markerDescription");
+		itemizedOverlay.addOverlay(overlayitem);
+
+
+		point = addDistanceOffset(squareCenter, distanceX, distanceY);
+		// TODO[debug]: just for testing proses
+		overlayitem = new OverlayItem(point, "markerTitle",
+				"'markerDescription");
+		itemizedOverlay.addOverlay(overlayitem);
+
+
+		point = addDistanceOffset(squareCenter, distanceX, -distanceY);
+		// TODO[debug]: just for testing proses
+		overlayitem = new OverlayItem(point, "markerTitle",
+				"'markerDescription");
+		itemizedOverlay.addOverlay(overlayitem);
+
+
+		point = addDistanceOffset(squareCenter, -distanceX, -distanceY);
+		// TODO[debug]: just for testing proses
+		overlayitem = new OverlayItem(point, "markerTitle",
+				"'markerDescription");
+		itemizedOverlay.addOverlay(overlayitem);
 
 		return point;
 	}
@@ -180,11 +238,24 @@ public class MyMapActivity extends MapActivity {
 		return randomGenerator.nextInt(max - min + 1) + min;
 	}
 
-	private void addRandomMarker(String markerTitle, String markerDescription) {
-		GeoPoint point = getRandomGeoPoint();
-		OverlayItem overlayitem = new OverlayItem(point, markerTitle,
-				markerDescription);
-		itemizedOverlay.addOverlay(overlayitem);
+	/**
+	 * TODO: make the GeoPoints unique in the list
+	 * Gives a list a random GeoPoints
+	 * @param squareCenter
+	 * @param squareSizeMeter
+	 * @param nbPoints
+	 * @return
+	 */
+	private ArrayList<GeoPoint> getRandomGeoPoints(GeoPoint squareCenter, int squareSizeMeter, int nbPoints)
+	{
+		ArrayList<GeoPoint> geoPoints = new ArrayList<GeoPoint>();
+		GeoPoint geoPoint;
+		for (int i = 0; i < nbPoints; i++) {
+			geoPoint = getRandomGeoPoint(squareCenter, squareSizeMeter);
+			geoPoints.add(geoPoint);
+		}
+
+		return geoPoints;
 	}
 
 	@Override
@@ -230,8 +301,15 @@ public class MyMapActivity extends MapActivity {
 	protected void onPause()
 	{
 		super.onPause();
-		myLocationOverlay.disableMyLocation();
-		locationManager.removeUpdates(itemizedOverlay);
+		if (myLocationOverlay != null)
+		{
+			myLocationOverlay.disableMyLocation();
+		}
+		if (locationManager != null)
+		{
+			locationManager.removeUpdates(itemizedOverlay);
+			locationManager.removeUpdates(locationListener);
+		}
 	}
 
 	/**
@@ -242,12 +320,41 @@ public class MyMapActivity extends MapActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		myLocationOverlay.enableMyLocation();
+		if (myLocationOverlay != null)
+		{
+			myLocationOverlay.enableMyLocation();
+		}
 
-		// Starts listeners
-		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,
-				1, itemizedOverlay);
+		if (locationManager != null)
+		{
+			// Starts listeners
+			locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,
+					1, itemizedOverlay);
+			locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,
+					1, locationListener);
+		}
 	}
+
+	private final LocationListener locationListener = new LocationListener() {
+		// TODO: verify we're close enough from a marker before showing it
+		public void onLocationChanged(Location location) {
+		}
+
+		@Override
+		public void onProviderDisabled(String provider) {
+			// TODO Auto-generated method stub
+		}
+
+		@Override
+		public void onProviderEnabled(String provider) {
+			// TODO Auto-generated method stub
+		}
+
+		@Override
+		public void onStatusChanged(String provider, int status, Bundle extras) {
+			// TODO Auto-generated method stub
+		}
+	};
 
 	public void savePreferences() {
 		// We need an Editor object to make preference changes.
