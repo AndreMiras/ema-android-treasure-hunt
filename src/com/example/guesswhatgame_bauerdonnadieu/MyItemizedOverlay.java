@@ -23,12 +23,18 @@ public class MyItemizedOverlay extends ItemizedOverlay<OverlayItem> implements
 	private Location lastLocation;
 
 	public MyItemizedOverlay(Drawable defaultMarker) {
-		super(boundCenterBottom(defaultMarker));
+		this(defaultMarker, null);
 	}
 	
 	public MyItemizedOverlay(Drawable defaultMarker, Context context) {
 		  super(boundCenterBottom(defaultMarker));
 		  mContext = context;
+		  /*
+		   * http://code.google.com/p/android/issues/detail?id=2035
+		   * The subclass should call this as soon as it has data,
+		   * before anything else gets called.
+		   */
+		  populate();
 		}
 
 	public void addOverlay(OverlayItem overlay) {
