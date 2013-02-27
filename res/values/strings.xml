@@ -11,15 +11,12 @@
     <string name="solve">Solve</string>
     <string name="map">Map</string>
     <string name="t_clues">Clues: </string>
-    <string name="t_clue1">Clue 1: </string>
-    <string name="t_clue2">Clue 2: </string>
-    <string name="t_clue3">Clue 3: </string>
-    <string name="t_clue1_val">Clue 1</string>
-    <string name="t_clue2_val">Clue 2</string>
-    <string name="t_clue3_val">Clue 3</string>
-    <string name="t_clue_val_default">NONE</string>
     <string name="t_enter_solution">Enter solution:</string>
     <string name="t_btn_back">Back</string>
     <string name="t_btn_try">Try</string>
+    <string name="clues_var_names">_CLUE</string>
+    <string name="clues_var_separator">;;;</string>
+    <string name="enigma_solution_var">enigmaSolution</string>
+    <string name="toto">toto</string>
 
 </resources>
