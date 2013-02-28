@@ -8,15 +8,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
@@ -26,7 +31,7 @@ import com.google.android.maps.MyLocationOverlay;
 import com.google.android.maps.Overlay;
 import com.google.android.maps.OverlayItem;
 
-public class MyMapActivity extends MapActivity implements OverlayItemProximityListener {
+public class MyMapActivity extends MapActivity implements OverlayItemProximityListener, LocationListener {
 	private final int RESULT_CLOSE_ALL = 30;
 	private final static int CLUE_NUMBERS = 5;
 	public static final String PREFS_NAME = "MyPrefsFile";
@@ -53,6 +58,7 @@ public class MyMapActivity extends MapActivity implements OverlayItemProximityLi
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_map);
+		checkForGpsSettings();
 		setupMapView();
 		setupLocationManager();
 		waitForFirstFix();
@@ -110,22 +116,73 @@ public class MyMapActivity extends MapActivity implements OverlayItemProximityLi
 		});
 	}
 
-	private void waitForLocationMessage()
-	{
-		// Waiting for GPS location message
-		if (progressDialog == null)
-		{
-			progressDialog = new ProgressDialog(MyMapActivity.this);
-		}
-		progressDialog.setMessage("Waiting for location...");
-		progressDialog.show();
+	/**
+	 * if GPS settings are enabled, shows the wait for location message
+	 */
+	private void waitForLocationMessage() {
+		if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
 
+			// Waiting for GPS location message
+			if (progressDialog == null) {
+				progressDialog = new ProgressDialog(MyMapActivity.this);
+			}
+			progressDialog.setMessage("Waiting for location...");
+			progressDialog.show();
+		}
 	}
 
 	private void endWaitForLocationMessage() {
 		if (progressDialog != null && progressDialog.isShowing()) {
 			progressDialog.dismiss();
 		}
+	}
+
+	/**
+	 * Checks if the GPS is enabled, opens the location settings activity if not
+	 */
+	private boolean checkForGpsSettings()
+	{
+		setupLocationManager();
+		boolean isGPS = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+		if(!isGPS)
+		{
+			// disables the wait for location progress dialog first
+			endWaitForLocationMessage();
+			openGpsSettingsDialog();
+		}
+
+		return isGPS;
+	}
+
+	private void openGpsSettingsDialog() {
+		final Dialog dialog = new Dialog(this);
+		dialog.setContentView(R.layout.gps);
+		dialog.setTitle("GPS");
+		dialog.setCancelable(false);
+		dialog.show();
+
+		Button gpsSettings = (Button) dialog.findViewById(R.id.gps_sett_button);
+		gpsSettings.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				dialog.dismiss();
+				startActivityForResult(
+						new Intent(
+								android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS),
+						0);
+			}
+		});
+
+		Button gpsCancel = (Button) dialog.findViewById(R.id.gps_cancel_button);
+		gpsCancel.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				dialog.dismiss();
+				finish();
+			}
+		});
 	}
 
 	private void optimalMapSetup()
@@ -139,7 +196,10 @@ public class MyMapActivity extends MapActivity implements OverlayItemProximityLi
 	{
 		// getSystemService
 		// Get the location manager
-	    locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		if (locationManager == null)
+		{
+			locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		}
 	}
 
 	// TODO: we should be loading them from XML files or something like that
@@ -352,6 +412,7 @@ public class MyMapActivity extends MapActivity implements OverlayItemProximityLi
 		if (locationManager != null)
 		{
 			locationManager.removeUpdates(itemizedOverlay);
+			locationManager.removeUpdates(this);
 		}
 	}
 
@@ -371,9 +432,13 @@ public class MyMapActivity extends MapActivity implements OverlayItemProximityLi
 		if (locationManager != null)
 		{
 			// Starts listeners
-			locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,
-					1, itemizedOverlay);
+			locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, // TODO: check the distance val
+					1.0f, itemizedOverlay);
+			locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000L, // TODO: check the distance val
+					1.0f, this);
+
 		}
+		waitForLocationMessage();
 	}
 
 	public void savePreferences() {
@@ -435,5 +500,25 @@ public class MyMapActivity extends MapActivity implements OverlayItemProximityLi
 		foundClueMarkersOverlayItems.add(overlayItem);
 		itemizedOverlay.removeOverlayItem(overlayItem);
 		mMapView.invalidate();
+	}
+
+	@Override
+	public void onLocationChanged(Location arg0) {
+		endWaitForLocationMessage();
+	}
+
+	@Override
+	public void onProviderDisabled(String arg0) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void onProviderEnabled(String arg0) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
+		// TODO Auto-generated method stub
 	}
 }
