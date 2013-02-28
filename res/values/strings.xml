@@ -18,5 +18,12 @@
     <string name="clues_var_separator">;;;</string>
     <string name="enigma_solution_var">enigmaSolution</string>
     <string name="toto">toto</string>
+    <string name="gamesrules">The aim of the game is to find the clues placed on the map. 
+        		The player has to walk near (1km) to the clue to discover it. 
+        		When you discover a clue, you can review it on the Solve Page where you can see all the clues you discovered yet.
+        		On the Solve Page, you can try to resolve the enigma thanks to the clues. 
+        		If you\'re wrong, you can try again or come back to the map to discover an other clue. If you\'re right, you win and you can quit the game. 
+        		Each time you open the game, a new enigma is loaded.
+        		Enjoy ! :)</string>
 
 </resources>
