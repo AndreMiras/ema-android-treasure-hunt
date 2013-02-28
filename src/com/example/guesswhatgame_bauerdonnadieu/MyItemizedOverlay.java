@@ -38,20 +38,26 @@ public class MyItemizedOverlay extends ItemizedOverlay<OverlayItem> implements
 		  populate();
 		}
 
-	public void addOverlay(OverlayItem overlay) {
-	    mOverlays.add(overlay);
+	public void addOverlayItem(OverlayItem item) {
+	    mOverlays.add(item);
 	    populate();
 	}
 
-	public void addOverlays(ArrayList<OverlayItem> overlays) {
+	public void addOverlayItems(ArrayList<OverlayItem> overlays) {
 		for (OverlayItem overlayItem : overlays) {
 		    mOverlays.add(overlayItem);
 		}
 	}
 
-	public ArrayList<OverlayItem> getOverLays()
+	public ArrayList<OverlayItem> getOverLayItems()
 	{
 		return mOverlays;
+	}
+
+	public boolean removeOverlayItem(OverlayItem item) {
+		boolean removed = mOverlays.remove(item);
+		populate();
+		return removed;
 	}
 
 	public void addOverlayItemProximityListener(OverlayItemProximityListener listener) {
@@ -91,10 +97,10 @@ public class MyItemizedOverlay extends ItemizedOverlay<OverlayItem> implements
 
 		if (closeEnough)
 		{
-			fireOverlayItemNear(item);
 			dialog.setTitle(item.getTitle());
 			dialog.setMessage(item.getSnippet());
 			dialog.show();
+			fireOverlayItemNear(item);
 		}
 
 		return closeEnough;
@@ -107,8 +113,10 @@ public class MyItemizedOverlay extends ItemizedOverlay<OverlayItem> implements
 	private boolean showClosePopupIfAny()
 	{
 		boolean wasCloseEnough = false;
+		ArrayList<OverlayItem> overlays = mOverlays;
 
-		for (OverlayItem item : mOverlays) {
+		for (int i = 0; i < mOverlays.size(); i++) {
+			OverlayItem item = mOverlays.get(i);
 			wasCloseEnough |= showPopupIfCloseEnough(item);
 		}
 

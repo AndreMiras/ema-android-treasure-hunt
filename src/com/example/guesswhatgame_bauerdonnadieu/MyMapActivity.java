@@ -29,6 +29,7 @@ import com.google.android.maps.OverlayItem;
 
 public class MyMapActivity extends MapActivity implements OverlayItemProximityListener {
 	private final int RESULT_CLOSE_ALL = 30;
+	private final static int CLUE_NUMBERS = 5;
 	public static final String PREFS_NAME = "MyPrefsFile";
 	
 	// Solution de l'�nigme
@@ -121,9 +122,7 @@ public class MyMapActivity extends MapActivity implements OverlayItemProximityLi
 		int squareSizeMeter = 10 * 1000; // 10 KM // TODO[hardcoded]: use consts instead
 		GeoPoint squareCenter = myLocationOverlay.getMyLocation();
 
-		addRandomMarkers(squareCenter, squareSizeMeter, 5); // TODO[hardcoded]:
-															// use consts
-															// instead
+		addRandomMarkers(squareCenter, squareSizeMeter, CLUE_NUMBERS);
 	}
 
 	private void addRandomMarkers(GeoPoint squareCenter, int squareSizeMeter, int count)
@@ -144,7 +143,7 @@ public class MyMapActivity extends MapActivity implements OverlayItemProximityLi
 	private void addMarker(GeoPoint markerPoint, String markerTitle, String markerDescription) {
 		OverlayItem overlayitem = new OverlayItem(markerPoint, markerTitle,
 				markerDescription);
-		itemizedOverlay.addOverlay(overlayitem);
+		itemizedOverlay.addOverlayItem(overlayitem);
 	}
 
 	/**
@@ -280,7 +279,7 @@ public class MyMapActivity extends MapActivity implements OverlayItemProximityLi
 		String cluesVarNames = this.getResources().getString(R.string.clues_var_names);
 		String separator = this.getResources().getString(R.string.clues_var_separator);
 		
-		for ( OverlayItem ovit : itemizedOverlay.getOverLays()) // allClueMarkersOverlayItems)
+		for ( OverlayItem ovit : itemizedOverlay.getOverLayItems()) // allClueMarkersOverlayItems)
 		// TODO : travailler avec la liste de markers d�couverts
 		//for ( OverlayItem ovit : foundClueMarkersOverlayItems)
 		{
@@ -408,5 +407,7 @@ public class MyMapActivity extends MapActivity implements OverlayItemProximityLi
 	public void overlayItemNear(OverlayItem overlayItem) {
 		// TODO: verify the item is not already present in the list
 		foundClueMarkersOverlayItems.add(overlayItem);
+		itemizedOverlay.removeOverlayItem(overlayItem);
+		mMapView.invalidate();
 	}
 }
