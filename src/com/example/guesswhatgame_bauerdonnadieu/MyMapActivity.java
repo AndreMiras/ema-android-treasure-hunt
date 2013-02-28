@@ -8,12 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
-import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.Menu;
@@ -46,6 +45,9 @@ public class MyMapActivity extends MapActivity implements OverlayItemProximityLi
 	 */
 	private ArrayList<OverlayItem> foundClueMarkersOverlayItems = new ArrayList<OverlayItem>();
 	private Random randomGenerator = new Random();
+	// private final ProgressDialog progressDialog = new ProgressDialog(MyMapActivity.this);
+	private ProgressDialog progressDialog;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -81,17 +83,23 @@ public class MyMapActivity extends MapActivity implements OverlayItemProximityLi
 		mMapView.invalidate(); // refreshes the map
 	}
 
-	// TODO: display some kind of animation and message saying we are waiting for GPS FIX
 	/**
-	 * - centers the map on user location
+	 * - waits for GPS location message
+	 * - centres the map on user location
 	 * - loads makers around the user location
 	 */
 	private void waitForFirstFix()
 	{
+		waitForLocationMessage();
 
-		// centers the map on user location
+		/**
+		 * - dismisses the progressDialog
+		 * - loads the markers
+		 * - centres the map on the user location
+		 */
 		myLocationOverlay.runOnFirstFix(new Runnable() {
 			public void run() {
+				endWaitForLocationMessage();
 				GeoPoint point = myLocationOverlay.getMyLocation();
 				mController.animateTo(point);
 				mController.setZoom(17);
@@ -100,6 +108,24 @@ public class MyMapActivity extends MapActivity implements OverlayItemProximityLi
 				optimalMapSetup();
 			}
 		});
+	}
+
+	private void waitForLocationMessage()
+	{
+		// Waiting for GPS location message
+		if (progressDialog == null)
+		{
+			progressDialog = new ProgressDialog(MyMapActivity.this);
+		}
+		progressDialog.setMessage("Waiting for location...");
+		progressDialog.show();
+
+	}
+
+	private void endWaitForLocationMessage() {
+		if (progressDialog != null && progressDialog.isShowing()) {
+			progressDialog.dismiss();
+		}
 	}
 
 	private void optimalMapSetup()
