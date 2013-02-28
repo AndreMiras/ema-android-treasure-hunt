@@ -19,6 +19,7 @@ import com.google.android.maps.OverlayItem;
 public class MyItemizedOverlay extends ItemizedOverlay<OverlayItem> implements
 		LocationListener {
 	private ArrayList<OverlayItem> mOverlays = new ArrayList<OverlayItem>();
+	private final EventListenerList listeners = new EventListenerList();
 	private Context mContext;
 	private Location lastLocation;
 
@@ -53,6 +54,24 @@ public class MyItemizedOverlay extends ItemizedOverlay<OverlayItem> implements
 		return mOverlays;
 	}
 
+	public void addOverlayItemProximityListener(OverlayItemProximityListener listener) {
+		listeners.add(OverlayItemProximityListener.class, listener);
+	}
+
+	public void removeOverlayItemProximityListener(OverlayItemProximityListener listener) {
+        listeners.remove(OverlayItemProximityListener.class, listener);
+    }
+
+	public OverlayItemProximityListener[] getOverlayItemProximityListener() {
+        return listeners.getListeners(OverlayItemProximityListener.class);
+    }
+
+	protected void fireOverlayItemNear(OverlayItem overlayItem) {
+		for (OverlayItemProximityListener listener : getOverlayItemProximityListener()) {
+			listener.overlayItemNear(overlayItem);
+		}
+    }
+
 	@Override
 	protected boolean onTap(int index) {
 	  return showPopupIfCloseEnough(index);
@@ -72,6 +91,7 @@ public class MyItemizedOverlay extends ItemizedOverlay<OverlayItem> implements
 
 		if (closeEnough)
 		{
+			fireOverlayItemNear(item);
 			dialog.setTitle(item.getTitle());
 			dialog.setMessage(item.getSnippet());
 			dialog.show();

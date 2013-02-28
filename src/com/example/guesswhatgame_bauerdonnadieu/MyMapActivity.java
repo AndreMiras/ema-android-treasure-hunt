@@ -27,7 +27,7 @@ import com.google.android.maps.MyLocationOverlay;
 import com.google.android.maps.Overlay;
 import com.google.android.maps.OverlayItem;
 
-public class MyMapActivity extends MapActivity {
+public class MyMapActivity extends MapActivity implements OverlayItemProximityListener {
 	private final int RESULT_CLOSE_ALL = 30;
 	public static final String PREFS_NAME = "MyPrefsFile";
 	
@@ -41,13 +41,9 @@ public class MyMapActivity extends MapActivity {
 	private MyItemizedOverlay itemizedOverlay;
 	private MyLocationOverlay myLocationOverlay;
 	/*
-	 * The list of all clue markers that could be found in the map
-	 */
-	private ArrayList<OverlayItem> allClueMarkersOverlayItems;
-	/*
 	 * The list of already found clue markers
 	 */
-	private ArrayList<OverlayItem> foundClueMarkersOverlayItems;
+	private ArrayList<OverlayItem> foundClueMarkersOverlayItems = new ArrayList<OverlayItem>();
 	private Random randomGenerator = new Random();
 
 	@Override
@@ -69,6 +65,7 @@ public class MyMapActivity extends MapActivity {
 				.getDrawable(R.drawable.blue_dot);
 		itemizedOverlay = new MyItemizedOverlay(drawable,
 				this);
+		itemizedOverlay.addOverlayItemProximityListener(this);
 		List<Overlay> mapOverlays = mMapView.getOverlays();
 
 		// sets myLocation
@@ -124,11 +121,9 @@ public class MyMapActivity extends MapActivity {
 		int squareSizeMeter = 10 * 1000; // 10 KM // TODO[hardcoded]: use consts instead
 		GeoPoint squareCenter = myLocationOverlay.getMyLocation();
 
-		if (allClueMarkersOverlayItems == null) // TODO: is this still needed?
-		{
-			addRandomMarkers(squareCenter, squareSizeMeter, 5); // TODO[hardcoded]: use consts instead
-		}
-		// itemizedOverlay.addOverlays(allClueMarkersOverlayItems); // TODO: is this still needed?
+		addRandomMarkers(squareCenter, squareSizeMeter, 5); // TODO[hardcoded]:
+															// use consts
+															// instead
 	}
 
 	private void addRandomMarkers(GeoPoint squareCenter, int squareSizeMeter, int count)
@@ -285,7 +280,7 @@ public class MyMapActivity extends MapActivity {
 		String cluesVarNames = this.getResources().getString(R.string.clues_var_names);
 		String separator = this.getResources().getString(R.string.clues_var_separator);
 		
-		for ( OverlayItem ovit : allClueMarkersOverlayItems)
+		for ( OverlayItem ovit : itemizedOverlay.getOverLays()) // allClueMarkersOverlayItems)
 		// TODO : travailler avec la liste de markers d�couverts
 		//for ( OverlayItem ovit : foundClueMarkersOverlayItems)
 		{
@@ -332,7 +327,6 @@ public class MyMapActivity extends MapActivity {
 		if (locationManager != null)
 		{
 			locationManager.removeUpdates(itemizedOverlay);
-			locationManager.removeUpdates(locationListener);
 		}
 	}
 
@@ -354,31 +348,8 @@ public class MyMapActivity extends MapActivity {
 			// Starts listeners
 			locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,
 					1, itemizedOverlay);
-			locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,
-					1, locationListener);
 		}
 	}
-
-	private final LocationListener locationListener = new LocationListener() {
-		// TODO: verify we're close enough from a marker before showing it
-		public void onLocationChanged(Location location) {
-		}
-
-		@Override
-		public void onProviderDisabled(String provider) {
-			// TODO Auto-generated method stub
-		}
-
-		@Override
-		public void onProviderEnabled(String provider) {
-			// TODO Auto-generated method stub
-		}
-
-		@Override
-		public void onStatusChanged(String provider, int status, Bundle extras) {
-			// TODO Auto-generated method stub
-		}
-	};
 
 	public void savePreferences() {
 		// We need an Editor object to make preference changes.
@@ -431,5 +402,11 @@ public class MyMapActivity extends MapActivity {
 	public void fakeClue3(View v)
 	{
 		//clue3Found = true;
+	}
+
+	@Override
+	public void overlayItemNear(OverlayItem overlayItem) {
+		// TODO: verify the item is not already present in the list
+		foundClueMarkersOverlayItems.add(overlayItem);
 	}
 }
