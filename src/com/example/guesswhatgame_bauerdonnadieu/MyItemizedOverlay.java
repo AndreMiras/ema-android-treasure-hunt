@@ -78,9 +78,22 @@ public class MyItemizedOverlay extends ItemizedOverlay<OverlayItem> implements
 		}
     }
 
+	/**
+	 * Pop-ups the clue title when tapping on it
+	 */
 	@Override
 	protected boolean onTap(int index) {
-	  return showPopupIfCloseEnough(index);
+		String notCloseEnoughMessage = "Not close enough"; // TODO[hardcoded]: to localised in appropriated file
+
+		boolean closeEnough = showPopupIfCloseEnough(index);
+		if (!closeEnough) {
+			OverlayItem item = mOverlays.get(index);
+			AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
+			dialog.setTitle(item.getTitle());
+			dialog.setMessage(notCloseEnoughMessage);
+			dialog.show();
+		}
+		return closeEnough;
 	}
 
 	// TODO: we may later display the popup automatically when the user is close enough
@@ -174,26 +187,6 @@ public class MyItemizedOverlay extends ItemizedOverlay<OverlayItem> implements
 		float actualDistanceMeter = l1.distanceTo(l2);
 		return (actualDistanceMeter < (float)maxDistanceMeter);
 	}
-
-	// TODO: crashing: You are only allowed to have a single MapView in a
-	// MapActivity
-	/*
-	private boolean onTapPopup2(int index) {
-		OverlayItem item = mOverlays.get(index);
-		LayoutInflater inflater = (LayoutInflater) mContext
-				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		// TODO: is this the correct way to do to get the map view?
-		MapView map = (MapView) ((MapActivity) mContext)
-		.findViewById(R.id.map_view);
-		View popUp = inflater.inflate(R.layout.activity_map, map, false);
-		MapView.LayoutParams mapParams = new MapView.LayoutParams(
-				ViewGroup.LayoutParams.WRAP_CONTENT,
-				ViewGroup.LayoutParams.WRAP_CONTENT, item.getPoint(), 0, 0,
-				MapView.LayoutParams.BOTTOM_CENTER);
-		map.addView(popUp, mapParams);
-		return true;
-	}
-	*/
 
 	@Override
 	protected OverlayItem createItem(int i) {
