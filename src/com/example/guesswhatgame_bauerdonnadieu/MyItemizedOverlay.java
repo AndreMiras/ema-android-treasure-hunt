@@ -55,29 +55,44 @@ public class MyItemizedOverlay extends ItemizedOverlay<OverlayItem> implements
 
 	@Override
 	protected boolean onTap(int index) {
-	  return onTapPopup(index);
+	  return showPopupIfCloseEnough(index);
 	}
 
 	// TODO: we may later display the popup automatically when the user is close enough
 	// this could be done using Proximity Alert
-	private boolean onTapPopup(int index) {
-		String defaultMessage = "Not close enough"; // TODO[hardcoded]: to localized in appropriated file
-		int distanceMeter = 1000; // TODO[hardcoded]: to be defined has const somewhere
+	private boolean showPopupIfCloseEnough(int index) {
 		OverlayItem item = mOverlays.get(index);
+		return showPopupIfCloseEnough(item);
+	}
+
+	private boolean showPopupIfCloseEnough(OverlayItem item) {
+		int distanceMeter = 1000; // TODO[hardcoded]: to be defined has const somewhere
+		boolean closeEnough = isClose(item.getPoint(), distanceMeter);
 		AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
 
-		dialog.setTitle(item.getTitle());
-		if (isClose(item.getPoint(), distanceMeter))
+		if (closeEnough)
 		{
+			dialog.setTitle(item.getTitle());
 			dialog.setMessage(item.getSnippet());
+			dialog.show();
 		}
-		else
-		{
-			dialog.setMessage(defaultMessage);
-		}
-		dialog.show();
 
-		return true;
+		return closeEnough;
+	}
+
+	/**
+	 * Loops over all the markers and show the ones that are close enough
+	 * @return true if a popup was shown
+	 */
+	private boolean showClosePopupIfAny()
+	{
+		boolean wasCloseEnough = false;
+
+		for (OverlayItem item : mOverlays) {
+			wasCloseEnough |= showPopupIfCloseEnough(item);
+		}
+
+		return wasCloseEnough;
 	}
 
 	/**
@@ -167,6 +182,7 @@ public class MyItemizedOverlay extends ItemizedOverlay<OverlayItem> implements
 	@Override
 	public void onLocationChanged(Location location) {
 		lastLocation = location;
+		showClosePopupIfAny();
 	}
 
 	@Override
