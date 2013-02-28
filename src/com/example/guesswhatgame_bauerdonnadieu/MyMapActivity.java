@@ -432,10 +432,12 @@ public class MyMapActivity extends MapActivity implements OverlayItemProximityLi
 		if (locationManager != null)
 		{
 			// Starts listeners
-			locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, // TODO: check the distance val
-					1.0f, itemizedOverlay);
-			locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000L, // TODO: check the distance val
-					1.0f, this);
+			final long minTimeMilliseconds = 1000L; // 1 second
+			final float minDistanceMeter = 1.0f; // 1 meter
+			locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, minTimeMilliseconds,
+					minDistanceMeter, itemizedOverlay);
+			locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, minTimeMilliseconds,
+					minDistanceMeter, this);
 
 		}
 		waitForLocationMessage();
