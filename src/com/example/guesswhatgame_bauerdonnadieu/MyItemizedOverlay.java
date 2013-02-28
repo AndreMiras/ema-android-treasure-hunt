@@ -83,7 +83,7 @@ public class MyItemizedOverlay extends ItemizedOverlay<OverlayItem> implements
 	 */
 	@Override
 	protected boolean onTap(int index) {
-		String notCloseEnoughMessage = "Not close enough"; // TODO[hardcoded]: to localised in appropriated file
+		String notCloseEnoughMessage = mContext.getString(R.string.not_close_enough);
 
 		boolean closeEnough = showPopupIfCloseEnough(index);
 		if (!closeEnough) {
