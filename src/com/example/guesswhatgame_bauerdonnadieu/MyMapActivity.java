@@ -34,6 +34,11 @@ import com.google.android.maps.OverlayItem;
 public class MyMapActivity extends MapActivity implements OverlayItemProximityListener, LocationListener {
 	private final int RESULT_CLOSE_ALL = 30;
 	private final static int CLUE_NUMBERS = 5;
+
+	/**
+	 * random markers will be loaded within this square
+	 */
+	private final static int RANDOM_SQUARE_SIZE_KM = 5;
 	public static final String PREFS_NAME = "MyPrefsFile";
 	
 	// Solution de l'�nigme
@@ -205,7 +210,7 @@ public class MyMapActivity extends MapActivity implements OverlayItemProximityLi
 	// TODO: we should be loading them from XML files or something like that
 	private void loadMarkers() {
 
-		int squareSizeMeter = 10 * 1000; // 10 KM // TODO[hardcoded]: use consts instead
+		int squareSizeMeter = RANDOM_SQUARE_SIZE_KM * 1000;
 		GeoPoint squareCenter = myLocationOverlay.getMyLocation();
 
 		addRandomMarkers(squareCenter, squareSizeMeter, CLUE_NUMBERS);
@@ -223,7 +228,6 @@ public class MyMapActivity extends MapActivity implements OverlayItemProximityLi
 			markerDescription = "Clue " + i;
 			addMarker(markerPoint, markerTitle, markerDescription);
 		}
-		// allClueMarkersOverlayItems = itemizedOverlay.getOverLays(); // TODO: is this still needed?
 	}
 
 	private void addMarker(GeoPoint markerPoint, String markerTitle, String markerDescription) {
@@ -233,7 +237,7 @@ public class MyMapActivity extends MapActivity implements OverlayItemProximityLi
 	}
 
 	/**
-	 * This is quite precise as long as the random distance offset is between 10-100 km
+	 * This is quite precise as long as the random distance offset is between 10-100 KM
 	 * @param originGeoPoint
 	 * @param distanceXMeter
 	 * @param distanceYMeter
@@ -249,8 +253,7 @@ public class MyMapActivity extends MapActivity implements OverlayItemProximityLi
 		double lat = lat0 + (180/Math.PI) * (distanceYMeter/earthRadiusMeter);
 		double lng = lng0 + (180/Math.PI) * (distanceXMeter/earthRadiusMeter)/Math.cos(lat0);
 		// radius = (int)projection.metersToEquatorPixels(item.getRadiusInMeters());
-		// converts to micro dedegrees GeoPoint
-		// GeoPoint point = new GeoPoint((int) (randomLat * 1E6), (int) (randomLng * 1E6));
+		// converts to micro degrees GeoPoint
 		int latE6 = (int) (lat * 1E6);
 		int lngE6 = (int) (lng * 1E6);
 		point = new GeoPoint(latE6, lngE6);
@@ -307,7 +310,7 @@ public class MyMapActivity extends MapActivity implements OverlayItemProximityLi
 
 		// so we get a random lat/long that is between min lat/long (bottom left) and max lat/long top right corner
 		// which ever left or right, we're interested in bottom and top
-		int minLat = bottomLeftPoint.getLatitudeE6();
+		int minLat = bottomRightPoint.getLatitudeE6();
 		int maxLat = topLeftPoint.getLatitudeE6();
 		int randomLat = getRandomInt(minLat, maxLat);
 
