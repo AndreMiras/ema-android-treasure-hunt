@@ -126,7 +126,6 @@ public class MyItemizedOverlay extends ItemizedOverlay<OverlayItem> implements
 	private boolean showClosePopupIfAny()
 	{
 		boolean wasCloseEnough = false;
-		ArrayList<OverlayItem> overlays = mOverlays;
 
 		for (int i = 0; i < mOverlays.size(); i++) {
 			OverlayItem item = mOverlays.get(i);

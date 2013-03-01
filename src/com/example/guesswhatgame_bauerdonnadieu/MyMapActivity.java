@@ -442,44 +442,6 @@ public class MyMapActivity extends MapActivity implements OverlayItemProximityLi
 		}
 		waitForLocationMessage();
 	}
-
-	public void savePreferences() {
-		// We need an Editor object to make preference changes.
-		// All objects are from android.context.Context
-		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-		SharedPreferences.Editor editor = settings.edit();
-		boolean testBoolValue = false;
-		editor.putBoolean("testBoolValue", testBoolValue);
-
-		// Commit the edits!
-		editor.commit();
-
-		/*
-		 * I'd like to be able to save the whole thing
-		 * allClueMarkersOverlayItems and foundClueMarkersOverlayItems But I
-		 * feel like I'm gonna have to do it myself using either sqlite or raw
-		 * files :(
-		 */
-		/*
-		 * savedInstanceState.putSerializable("allClueMarkersOverlayItems",
-		 * allClueMarkersOverlayItems);
-		 * savedInstanceState.putSerializable("foundClueMarkersOverlayItems",
-		 * foundClueMarkersOverlayItems);
-		 */
-	}
-
-	public void restorePreferences() {
-		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-		boolean silent = settings.getBoolean("silentMode", false);
-		// setSilent(silent);
-
-		/*
-		 * allClueMarkersOverlayItems = (ArrayList<OverlayItem>)
-		 * savedInstanceState .getSerializable("allClueMarkersOverlayItems");
-		 * foundClueMarkersOverlayItems = (ArrayList<OverlayItem>)
-		 * savedInstanceState .getSerializable("foundClueMarkersOverlayItems");
-		 */
-	}
 	
 	public void fakeClue1(View v)
 	{
