@@ -22,6 +22,7 @@ import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
@@ -32,12 +33,14 @@ import com.google.android.maps.Overlay;
 import com.google.android.maps.OverlayItem;
 
 public class MyMapActivity extends MapActivity implements OverlayItemProximityListener, LocationListener {
-	private final int RESULT_CLOSE_ALL = 30;
-	private final static int CLUE_NUMBERS = 5;
+	private final int RESULT_CLOSE_ALL = 30;	
+	private static int CLUE_NUMBERS = 0;
 	public static final String PREFS_NAME = "MyPrefsFile";
 	
 	// Solution de l'�nigme
 	private static String enigmaSolution = "solution";
+	private static String markersTitle  = "";
+	private List<String> clues;
 	
 
 	private MapView mMapView;
@@ -58,6 +61,23 @@ public class MyMapActivity extends MapActivity implements OverlayItemProximityLi
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_map);
+		
+		markersTitle = this.getResources().getString(R.string.markers_title);
+		
+		Bundle extras = getIntent().getExtras();		
+		if(extras != null) 
+		{
+			enigmaSolution = extras.getString(this.getResources().getString(R.string.enigma_solution_var));
+			
+			String cluesVarNames = this.getResources().getString(R.string.clues_var_names);
+			this.clues = extras.getStringArrayList(cluesVarNames);	
+			
+			if(clues != null && clues.size() > 0)
+			{				
+				CLUE_NUMBERS = clues.size();
+			}			
+		}
+		
 		checkForGpsSettings();
 		setupMapView();
 		setupLocationManager();
@@ -219,11 +239,10 @@ public class MyMapActivity extends MapActivity implements OverlayItemProximityLi
 		String markerDescription;
 		for (int i = 0; i < count; i++) {
 			markerPoint = geoPoints.get(i);
-			markerTitle = "Title " + i;
-			markerDescription = "Clue " + i;
+			markerTitle = markersTitle + i;
+			markerDescription = clues.get(i);
 			addMarker(markerPoint, markerTitle, markerDescription);
-		}
-		// allClueMarkersOverlayItems = itemizedOverlay.getOverLays(); // TODO: is this still needed?
+		}		
 	}
 
 	private void addMarker(GeoPoint markerPoint, String markerTitle, String markerDescription) {
@@ -364,10 +383,8 @@ public class MyMapActivity extends MapActivity implements OverlayItemProximityLi
 		
 		String cluesVarNames = this.getResources().getString(R.string.clues_var_names);
 		String separator = this.getResources().getString(R.string.clues_var_separator);
-		
-		for ( OverlayItem ovit : itemizedOverlay.getOverLayItems()) // allClueMarkersOverlayItems)
-		// TODO : travailler avec la liste de markers d�couverts
-		//for ( OverlayItem ovit : foundClueMarkersOverlayItems)
+				
+		for ( OverlayItem ovit : foundClueMarkersOverlayItems)
 		{
 			ovitTitle = ovit.getTitle();
 			ovitSnippet = ovit.getSnippet();
@@ -479,22 +496,7 @@ public class MyMapActivity extends MapActivity implements OverlayItemProximityLi
 		 * foundClueMarkersOverlayItems = (ArrayList<OverlayItem>)
 		 * savedInstanceState .getSerializable("foundClueMarkersOverlayItems");
 		 */
-	}
-	
-	public void fakeClue1(View v)
-	{
-		//clue1Found = true;
-	}
-	
-	public void fakeClue2(View v)
-	{
-		//clue2Found = true;
-	}
-	
-	public void fakeClue3(View v)
-	{
-		//clue3Found = true;
-	}
+	}	
 
 	@Override
 	public void overlayItemNear(OverlayItem overlayItem) {

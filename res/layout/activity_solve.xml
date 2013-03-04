@@ -3,54 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".SolveActivity" >
-
-    <!--TextView
-        android:id="@+id/textClue1Val"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/textClue1"
-        android:layout_alignBottom="@+id/textClue1"
-        android:layout_centerHorizontal="true"
-        android:text="@string/t_clue_val_default"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
-
-    <TextView
-        android:id="@+id/textClue2Val"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/textClue1"
-        android:layout_centerHorizontal="true"
-        android:text="@string/t_clue_val_default"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
-
-    <TextView
-        android:id="@+id/textClue1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/editSolution"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="56dp"
-        android:text="@string/t_clue1"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
-
-    <TextView
-        android:id="@+id/textClue2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/editSolution"
-        android:layout_below="@+id/textClue1"
-        android:text="@string/t_clue2"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
-
-    <TextView
-        android:id="@+id/textClue3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/editSolution"
-        android:layout_below="@+id/textClue2"
-        android:text="@string/t_clue3"
-        android:textAppearance="?android:attr/textAppearanceMedium" /-->
-
+   
     <TextView
         android:id="@+id/textEnterSolution"
         android:layout_width="wrap_content"
@@ -69,17 +22,7 @@
         android:layout_alignTop="@+id/textEnterSolution"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="33dp"
-        android:ems="10" />
-
-    <!--TextView
-        android:id="@+id/textClue3Val"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/textClue3"
-        android:layout_alignBottom="@+id/textClue3"
-        android:layout_alignLeft="@+id/textClue2Val"
-        android:text="@string/t_clue_val_default"
-        android:textAppearance="?android:attr/textAppearanceMedium" /-->
+        android:ems="10" />   
 
     <TextView
         android:id="@+id/textClues"

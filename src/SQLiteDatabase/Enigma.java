@@ -33,7 +33,7 @@ public class Enigma {
 		return clueList;
 	}
 
-	public void setClueList(List<String> clueList) {
+	public void setClueList(ArrayList<String> clueList) {
 		this.clueList = clueList;
 	}
 

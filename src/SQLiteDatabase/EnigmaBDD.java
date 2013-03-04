@@ -1,5 +1,8 @@
 package SQLiteDatabase;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -166,9 +169,9 @@ public class EnigmaBDD {
 		return bdd.delete(CLUES_TABLE, CLUES_COL_ENIGMA + "=?", new String[]{String.valueOf(enigmaId)});
 	}
  
-	private final String MY_QUERY = "SELECT " + CLUES_COL_ENIGMA + 
+	private final String MY_QUERY = "SELECT " + CLUES_COL_CLUE + 
 									" FROM "  + CLUES_TABLE      + " clues INNER JOIN "  + ENIGMA_TABLE + " enigma" +
-									" ON clues." + CLUES_COL_ID + "=enigma." + ENIGMA_COL_ID + 
+									" ON clues." + CLUES_COL_ENIGMA + "=enigma." + ENIGMA_COL_ID + 
 									" WHERE enigma." + ENIGMA_COL_SOLUTION + "=?" ;
 	public Enigma getEnigmaWithSolution(String solution){
 		//Récupère dans un Cursor les valeurs correspondant à une énigme contenu dans la BDD (ici on sélectionne l'énigme grâce à sa solution)
@@ -193,15 +196,34 @@ public class EnigmaBDD {
 		enigma.setId(c1.getInt(NUM_ENIGMA_COL_ID));
 		enigma.setEnigmaSolution(c1.getString(NUM_ENIGMA_COL_SOLUTION));		
 		//On ferme le cursor
-		c1.close();
+		c1.close();		
 		
-		//ArrayList<String> results = new ArrayList<String>()
+		
 		c2.moveToFirst();
 		do enigma.getClueList().add(c2.getString(0));
 		while(c2.moveToNext());
 		c2.close();
  
+		
 		//On retourne l'énigme
 		return enigma;
+	}
+	
+	private final String QUERY = "SELECT "+ ENIGMA_COL_SOLUTION + " FROM " + ENIGMA_TABLE;
+	public List<Enigma> getAllEnigmas()
+	{		
+		//Récupère toutes les énigmes
+		Cursor c = bdd.rawQuery(QUERY, null);
+			
+		if(c.getCount() == 0) return null ;
+		
+		List<Enigma> enigmas = new ArrayList<Enigma>();
+		
+		c.moveToFirst();
+		do enigmas.add(getEnigmaWithSolution(c.getString(0)));
+		while(c.moveToNext());		
+		c.close();
+			
+		return enigmas;
 	}
 }
