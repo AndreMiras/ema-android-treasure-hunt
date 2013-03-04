@@ -14,40 +14,24 @@
         />
 
    <Button
-        android:id="@+id/btn_solve"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="71dp" 
-        android:text="@string/solve"
-        android:onClick="goToSolveActivityClick"/>
-
-   <Button
-       android:id="@+id/button1"
+       android:id="@+id/btn_solve"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
-       android:layout_alignParentLeft="true"
-       android:layout_alignParentTop="true"
-       android:text="DEBUG - CLUE1" 
-       android:onClick="fakeClue1" />
+       android:layout_alignParentBottom="true"
+       android:layout_alignParentRight="true"
+       android:layout_marginBottom="16dp"
+       android:layout_marginRight="17dp"
+       android:onClick="goToSolveActivityClick"
+       android:text="@string/solve" />
 
    <Button
-       android:id="@+id/button2"
+       android:id="@+id/btn_back"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
+       android:layout_alignBaseline="@+id/btn_solve"
+       android:layout_alignBottom="@+id/btn_solve"
        android:layout_alignParentLeft="true"
-       android:layout_below="@+id/button1"
-       android:text="DEBUG - CLUE2" 
-       android:onClick="fakeClue2" />
-
-   <Button
-       android:id="@+id/button3"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:layout_alignParentLeft="true"
-       android:layout_below="@+id/button2"
-       android:text="DEBUG - CLUE3" 
-       android:onClick="fakeClue3" />
+       android:layout_marginLeft="16dp"
+       android:text="@string/t_btn_back" />
 
 </RelativeLayout>

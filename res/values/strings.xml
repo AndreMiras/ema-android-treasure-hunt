@@ -18,6 +18,8 @@
     <string name="clues_var_names">_CLUE</string>
     <string name="clues_var_separator">;;;</string>
     <string name="enigma_solution_var">enigmaSolution</string>
+    <string name="update">Update</string>
+    <string name="markers_title">CLUE #</string>
     <string name="toto">toto</string>
 
     <!-- StartActivity -->
