@@ -4,13 +4,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.google.android.maps.OverlayItem;
-
 import SQLiteDatabase.Enigma;
 import SQLiteDatabase.EnigmaBDD;
-import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Toast;
@@ -70,13 +68,13 @@ public class StartActivity extends Activity
 	
 	public Enigma chooseRandomEnigma()
 	{	
-		//Création d'une instance de la base SQLite
+		//Crï¿½ation d'une instance de la base SQLite
         EnigmaBDD enigmaDB = new EnigmaBDD(this);        
         
-        //On ouvre la base de données pour écrire dedans
+        //On ouvre la base de donnï¿½es pour ï¿½crire dedans
         enigmaDB.open();
         
-        //Chargement des énigmes
+        //Chargement des ï¿½nigmes
         List<Enigma> enigmas = enigmaDB.getAllEnigmas();
         
         enigmaDB.close();
@@ -94,39 +92,39 @@ public class StartActivity extends Activity
 		int nbFailed  = 0;
 		boolean update = false;
 		
-		//Création d'une instance de la base SQLite
+		//Crï¿½ation d'une instance de la base SQLite
         EnigmaBDD enigmaDB = new EnigmaBDD(this);
  
-        //Création des énigmes    
+        //Crï¿½ation des ï¿½nigmes    
         List<Enigma> enigmas = generateFakeEnigmas();
         
-        //On ouvre la base de données pour écrire dedans
+        //On ouvre la base de donnï¿½es pour ï¿½crire dedans
         enigmaDB.open();
         
         for(Enigma enigma : enigmas)
         {
         	update = false;
         	
-	        //Pour vérifier que l'on a bien créé notre énigme dans la BDD
-	        //on extrait l'énigme de la BDD grâce à sa solution
+	        //Pour vï¿½rifier que l'on a bien crï¿½ï¿½ notre ï¿½nigme dans la BDD
+	        //on extrait l'ï¿½nigme de la BDD grï¿½ce ï¿½ sa solution
 	        Enigma enigmaFromDB = enigmaDB.getEnigmaWithSolution(enigma.getEnigmaSolution());
 	        
-	        //Si une énigme est retournée (donc si l'énigme à bien étée ajoutée à la BDD)
+	        //Si une ï¿½nigme est retournï¿½e (donc si l'ï¿½nigme ï¿½ bien ï¿½tï¿½e ajoutï¿½e ï¿½ la BDD)
 	        if(enigmaFromDB != null){
-	        	//On met à jour l'énigme dans la BDD
+	        	//On met ï¿½ jour l'ï¿½nigme dans la BDD
 		        enigmaDB.updateEnigma(enigmaFromDB.getId(), enigma);  
 		        update = true;
 	        } 
 	        else
 	        {
-	        	//On insère l'énigme que l'on vient de créer
+	        	//On insï¿½re l'ï¿½nigme que l'on vient de crï¿½er
 		        enigmaDB.insertEnigma(enigma);
 	        }	
 	        
-	        //On vérifie à nouveau
+	        //On vï¿½rifie ï¿½ nouveau
 	        enigmaFromDB = enigmaDB.getEnigmaWithSolution(enigma.getEnigmaSolution());
 	        if(enigmaFromDB != null){
-	        	//On affiche les infos de l'énigme dans un Toast
+	        	//On affiche les infos de l'ï¿½nigme dans un Toast
 	        	//Toast.makeText(this, enigmaFromDB.toString(), Toast.LENGTH_LONG).show();	 
 	        	
 	        	if(update) nbUpdated++;
